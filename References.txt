@@ -1,3 +1,4 @@
 Stonebraker’s Turing Award Lecture https://www.youtube.com/watch?v=BbGeKi6T6QI
 Turing Awards https://amturing.acm.org/
 Postgres Extensibility documentation https://www.postgresql.org/docs/12/extend.html
+Elephant Roads (Forks and Variants) https://www.slideshare.net/pgconf/elephant-roads-a-tour-of-postgres-forks
