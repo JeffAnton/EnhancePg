@@ -1,0 +1,27 @@
+--
+-- Demo commands for Enhancing Postgres by Jeff Anton (Perforce Open Logic)
+--
+
+-- show tables
+\d
+
+-- show databases
+\l
+
+-- show datatypes
+\dT
+
+-- see psql actions
+\?
+
+-- Simple C function
+
+select simple();
+
+select * from test_chapter order by a;
+
+select a::text as t from test_chapter order by t;
+
+SELECT * from test_chapter where a = '1.4';
+SELECT * from test_chapter where a < '22';
+SELECT * from test_chapter where a > '56.0';

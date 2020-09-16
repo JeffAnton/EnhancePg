@@ -1,0 +1,2 @@
+CREATE FUNCTION simple() RETURNS text
+       AS '_OBJWD_/simple' LANGUAGE C;

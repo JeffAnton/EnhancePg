@@ -1,0 +1,113 @@
+---------------------------------------------------------------------------
+--
+-- chapter.sql-
+--
+-- Portions Copyright (c) 1996-2020, PostgreSQL Global Development Group
+-- Portions Copyright (c) 1994, Regents of the University of California
+--
+---------------------------------------------------------------------------
+
+CREATE FUNCTION chapter_in(cstring)
+   RETURNS chapter
+   AS '_OBJWD_/chapter'
+   LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION chapter_out(chapter)
+   RETURNS cstring
+   AS '_OBJWD_/chapter'
+   LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION chapter_recv(internal)
+   RETURNS chapter
+   AS '_OBJWD_/chapter'
+   LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION chapter_send(chapter)
+   RETURNS bytea
+   AS '_OBJWD_/chapter'
+   LANGUAGE C IMMUTABLE STRICT;
+
+
+CREATE TYPE chapter (
+   internallength = 8,
+   input = chapter_in,
+   output = chapter_out,
+   receive = chapter_recv,
+   send = chapter_send,
+   alignment = int4
+);
+
+
+CREATE TABLE test_chapter (
+	a	chapter,
+	t	text
+);
+
+INSERT INTO test_chapter VALUES ('1.4', 'first');
+INSERT INTO test_chapter VALUES ('33', 'later');
+INSERT INTO test_chapter VALUES ('10.1', 'more');
+
+SELECT * FROM test_chapter;
+
+-- define the required operators
+CREATE FUNCTION chapter_abs_lt(chapter, chapter) RETURNS bool
+   AS '_OBJWD_/chapter' LANGUAGE C IMMUTABLE STRICT;
+CREATE FUNCTION chapter_abs_le(chapter, chapter) RETURNS bool
+   AS '_OBJWD_/chapter' LANGUAGE C IMMUTABLE STRICT;
+CREATE FUNCTION chapter_abs_eq(chapter, chapter) RETURNS bool
+   AS '_OBJWD_/chapter' LANGUAGE C IMMUTABLE STRICT;
+CREATE FUNCTION chapter_abs_ge(chapter, chapter) RETURNS bool
+   AS '_OBJWD_/chapter' LANGUAGE C IMMUTABLE STRICT;
+CREATE FUNCTION chapter_abs_gt(chapter, chapter) RETURNS bool
+   AS '_OBJWD_/chapter' LANGUAGE C IMMUTABLE STRICT;
+
+CREATE OPERATOR < (
+   leftarg = chapter, rightarg = chapter, procedure = chapter_abs_lt,
+   commutator = > , negator = >= ,
+   restrict = scalarltsel, join = scalarltjoinsel
+);
+CREATE OPERATOR <= (
+   leftarg = chapter, rightarg = chapter, procedure = chapter_abs_le,
+   commutator = >= , negator = > ,
+   restrict = scalarlesel, join = scalarlejoinsel
+);
+CREATE OPERATOR = (
+   leftarg = chapter, rightarg = chapter, procedure = chapter_abs_eq,
+   commutator = = ,
+   -- leave out negator since we didn't create <> operator
+   -- negator = <> ,
+   restrict = eqsel, join = eqjoinsel
+);
+CREATE OPERATOR >= (
+   leftarg = chapter, rightarg = chapter, procedure = chapter_abs_ge,
+   commutator = <= , negator = < ,
+   restrict = scalargesel, join = scalargejoinsel
+);
+CREATE OPERATOR > (
+   leftarg = chapter, rightarg = chapter, procedure = chapter_abs_gt,
+   commutator = < , negator = <= ,
+   restrict = scalargtsel, join = scalargtjoinsel
+);
+
+CREATE FUNCTION chapter_abs_cmp(chapter, chapter) RETURNS int4
+   AS '_OBJWD_/chapter' LANGUAGE C IMMUTABLE STRICT;
+
+CREATE OPERATOR CLASS chapter_abs_ops
+    DEFAULT FOR TYPE chapter USING btree AS
+        OPERATOR        1       < ,
+        OPERATOR        2       <= ,
+        OPERATOR        3       = ,
+        OPERATOR        4       >= ,
+        OPERATOR        5       > ,
+        FUNCTION        1       chapter_abs_cmp(chapter, chapter);
+
+
+INSERT INTO test_chapter VALUES ('1.1', 'development');
+INSERT INTO test_chapter VALUES ('91.9', 'crisis');
+
+CREATE INDEX test_cplx_ind ON test_chapter
+   USING btree(a chapter_abs_ops);
+
+SELECT * from test_chapter where a = '1.4';
+SELECT * from test_chapter where a < '22';
+SELECT * from test_chapter where a > '56.0';

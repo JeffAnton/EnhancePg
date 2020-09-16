@@ -2,3 +2,9 @@ Stonebraker’s Turing Award Lecture https://www.youtube.com/watch?v=BbGeKi6T6QI
 Turing Awards https://amturing.acm.org/
 Postgres Extensibility documentation https://www.postgresql.org/docs/12/extend.html
 Elephant Roads (Forks and Variants) https://www.slideshare.net/pgconf/elephant-roads-a-tour-of-postgres-forks
+
+Postgres Types code
+(From development git repo https://git.postgresql.org/git/postgresql.git):
+
+Tutorial code - <POSTGRESQL tree>/src/tutorial
+Built in datatype code - <POSTGRESQL tree>/src/backend/utils/adt
